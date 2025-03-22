@@ -322,6 +322,46 @@ input[type="file"] {
   margin-top: -10px;
 }
 
+.success-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+}
+
+.success-message h2{
+  font-size: 18px;
+  color: #131313;
+  max-width: 400px;
+  margin-bottom: 25px;
+  margin-top: 0;
+  padding: 0;
+}
+
+.success-icon img {
+  width: 112px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.finish-button {
+  background-color: #163D8B;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.finish-button:hover {
+  background-color: #003f87;
+}
+
+
 /* For screens 1024px and below */
 @media (max-width: 1024px) {
   .form-header {
@@ -549,3 +589,5 @@ input[type="file"] {
     font-size: 11px;
   }
 }
+
+

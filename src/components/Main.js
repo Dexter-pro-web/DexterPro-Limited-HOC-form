@@ -20,6 +20,7 @@ export default function Main() {
     stopWorkEnforced: "",
     stopWorkActions: "",
     stopWorkEvidence: null,
+    otherCausalFactors: "",
   });
 
   const handleChange = (e) => {
@@ -148,7 +149,7 @@ export default function Main() {
         formData.stopWorkEvidence &&
         formData.stopWorkEvidence.size > 1048576
       ) {
-        // 1MB max
+        
         errors.stopWorkEvidence = "File size must be less than 1MB.";
       }
     }
@@ -185,7 +186,7 @@ export default function Main() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Prepare the form payload including all the form data
+    
     const formPayload = {
       unsafe: formData.unsafe,
       location: formData.location,
@@ -198,15 +199,16 @@ export default function Main() {
       correctiveActions: formData.correctiveActions,
       lifeSavingRules: formData.lifeSavingRules,
       causalFactors: formData.causalFactors,
+      otherCausalFactors: formData.otherCausalFactors || "",
       stopWorkEnforced: formData.stopWorkEnforced,
       stopWorkActions: formData.stopWorkActions,
       stopWorkEvidence: formData.stopWorkEvidence
         ? formData.stopWorkEvidence.name
-        : null, // Only send file name or null
+        : null, 
     };
 
     try {
-      // Post the form data to your API handler
+      
       const response = await fetch("/api/submit", {
         method: "POST",
         headers: {
@@ -216,7 +218,7 @@ export default function Main() {
       });
 
       if (response.ok) {
-        setFormSubmitted(true); // Display success message or handle UI update
+        setFormSubmitted(true); 
         console.log("Form submitted successfully!");
       } else {
         console.error("Form submission failed.");
@@ -245,17 +247,7 @@ export default function Main() {
         {formSubmitted ? (
           <div className="success-message">
             <div className="success-icon">
-              {/* This can be a checkmark or an icon */}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="green"
-                width="48px"
-                height="48px"
-              >
-                <path d="M0 0h24v24H0z" fill="none" />
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-5-5 1.41-1.41L11 14.17l7.59-7.59L20 8l-9 9z" />
-              </svg>
+            <img src="/images/success.png" alt="success icon" />
             </div>
             <h2>HOC card has been submitted successfully</h2>
             <button
@@ -589,7 +581,6 @@ export default function Main() {
                       document.getElementById("file-upload").click()
                     }
                     style={{
-                      border: "2px dashed #ccc",
                       padding: "20px",
                       textAlign: "center",
                       cursor: "pointer",
