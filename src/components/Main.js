@@ -151,14 +151,27 @@ export default function Main() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+  
+    // Prepare the form payload including all the form data
     const formPayload = {
-      name: formData.name,
-      email: formData.email,
-      message: formData.message,
+      unsafe: formData.unsafe,
+      location: formData.location,
+      observerName: formData.observerName,
+      company: formData.company,
+      position: formData.position,
+      date: formData.date,
+      time: formData.time,
+      incidentDetails: formData.incidentDetails,
+      correctiveActions: formData.correctiveActions,
+      lifeSavingRules: formData.lifeSavingRules,
+      causalFactors: formData.causalFactors,
+      stopWorkEnforced: formData.stopWorkEnforced,
+      stopWorkActions: formData.stopWorkActions,
+      stopWorkEvidence: formData.stopWorkEvidence ? formData.stopWorkEvidence.name : null // Only send file name or null
     };
   
     try {
+      // Post the form data to your API handler
       const response = await fetch('/api/submit', {
         method: 'POST',
         headers: {
@@ -168,14 +181,16 @@ export default function Main() {
       });
   
       if (response.ok) {
+        setFormSubmitted(true); // Display success message or handle UI update
         console.log('Form submitted successfully!');
       } else {
         console.error('Form submission failed.');
       }
     } catch (error) {
-      console.error('An error occurred:', error);
+      console.error('An error occurred during form submission:', error);
     }
   };
+  
   
 
   
