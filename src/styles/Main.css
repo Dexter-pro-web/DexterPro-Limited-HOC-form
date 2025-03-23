@@ -10,6 +10,13 @@
   background-size: cover;
   background-position: center;
   position: relative;
+  animation: changeBg 30s infinite;
+}
+
+@keyframes changeBg {
+  0%, 33% { background-image: url("/public/images/hoc-img.png"); }
+  34%, 66% { background-image: url("/public/images/hoc-img3.jpg"); }
+  67%, 100% { background-image: url("/public/images/hoc-img2.jpg"); }
 }
 
 .overlay {
@@ -36,8 +43,6 @@
   flex-direction: column;
   align-items: center;
   background-color: white;
-  overflow: scroll;
-  position: relative;
 }
 
 label {
@@ -69,6 +74,8 @@ label {
   width: 100%;
   max-width: 585px;
   box-sizing: border-box;
+  height: 100vh;
+  overflow: scroll;
 }
 
 .form-title {
