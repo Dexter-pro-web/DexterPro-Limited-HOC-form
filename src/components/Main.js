@@ -196,7 +196,12 @@ export default function Main() {
   
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
+    // Validate the final step (step 4)
+    if (!validateForm(4)) {
+      return; // Stop the submission if there are validation errors
+    }
+  
     const formPayload = {
       unsafe: formData.unsafe,
       location: formData.location,
@@ -214,9 +219,9 @@ export default function Main() {
       stopWorkActions: formData.stopWorkActions,
       stopWorkEvidence: formData.stopWorkEvidence
         ? formData.stopWorkEvidence.name
-        : null, 
+        : null,
     };
-
+  
     try {
       const response = await fetch("/api/submit", {
         method: "POST",
@@ -225,9 +230,9 @@ export default function Main() {
         },
         body: JSON.stringify(formPayload),
       });
-
+  
       if (response.ok) {
-        setFormSubmitted(true); 
+        setFormSubmitted(true);
         console.log("Form submitted successfully!");
       } else {
         console.error("Form submission failed.");
@@ -236,6 +241,7 @@ export default function Main() {
       console.error("An error occurred during form submission:", error);
     }
   };
+  
 
   return (
     <div className="main">
