@@ -361,6 +361,84 @@ input[type="file"] {
   background-color: #003f87;
 }
 
+.file-preview-container {
+  display: flex;
+  padding: 16px;
+  border: 1px solid #D0D5DD;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  margin-top: 10px;
+  gap: 20px;
+  margin-bottom: 45px;
+}
+
+.file-icon {
+  width: 35px;
+  height: 35px;
+  flex: 0 0 5%; /* File icon takes 5% of the container */
+}
+
+.delete-icon {
+  cursor: pointer;
+  max-width: 35px;
+  width: auto;
+  height: 35px;
+  flex: 0 0 7%; /* Delete icon takes 7% of the container */
+  text-align: right;
+}
+
+.file-info {
+  flex: 1; /* File info takes the remaining space of the container */
+  margin: 0;
+  padding: 0;
+}
+
+.file-name {
+  color: #344054;
+  font-weight: bold;
+  font-size: 14px;
+  margin: 0;
+  margin-bottom: 5px;
+}
+
+.file-size {
+  color: #667085;
+  font-size: 14px;
+  margin: 0;
+  margin-bottom: 7px;
+}
+
+.progress-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Add some space between progress bar and percentage */
+  margin-top: 10px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: #163D8B;
+  border-radius: 4px;
+}
+
+.progress {
+  height: 6px;
+  border-radius: 4px;
+  background-color: #163D8B;
+  width: 100%; /* Progress width */
+}
+
+.progress-percent {
+  color: #344054;
+  font-size: 14px;
+}
+
+
+
+
+
+
 
 @media (max-width: 1024px) {
   .form-header {

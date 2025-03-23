@@ -120,8 +120,8 @@ export default function Main() {
         errors.causalFactors = "Please select at least one causal factor.";
       }
       if (
-        formData.causalFactors.includes("Others") &&
-        !formData.otherCausalFactors
+        formData.causalFactors.includes("Others") && 
+        (!formData.otherCausalFactors || formData.otherCausalFactors.trim() === "")
       ) {
         errors.otherCausalFactors = "Please specify other causal factors.";
       }
@@ -311,14 +311,25 @@ export default function Main() {
       <div className="date-field">
         <label htmlFor="date">Date</label>
         <input 
-          type="date" 
-          name="date" 
-          value={formData.date} 
-          onChange={handleChange} 
-          min={new Date().toISOString().split('T')[0]} 
-          max={new Date().toISOString().split('T')[0]}
-          onClick={(e) => e.target.showPicker()} 
-        />
+  type="date" 
+  name="date" 
+  value={formData.date} 
+  onChange={(e) => {
+    const selectedDate = new Date(e.target.value);
+    const today = new Date();
+
+    if (selectedDate > today) {
+      // Prevent the form from accepting a future date
+      alert("You cannot select a future date.");
+      e.target.value = today.toISOString().split('T')[0];  // Reset to today's date
+    } else {
+      handleChange(e);  // Proceed with regular form handling if date is valid
+    }
+  }} 
+  max={new Date().toISOString().split('T')[0]}  // Restrict future dates natively
+  onClick={(e) => e.target.showPicker()} 
+/>
+
         {formErrors.date && <p className="error">{formErrors.date}</p>}
       </div>
       <div className="time-field">
@@ -419,7 +430,18 @@ export default function Main() {
         <input type="text" name="otherCausalFactors" value={formData.otherCausalFactors || ""} onChange={handleChange} placeholder="Specify" className="others-input" />
       </label>
     </div>
-    {formErrors.causalFactors && <p className="error">{formErrors.causalFactors}</p>}
+    {(formErrors.causalFactors || formErrors.otherCausalFactors) && (
+  <p className="error">
+    {formErrors.causalFactors && <span>{formErrors.causalFactors}</span>}
+    {formErrors.otherCausalFactors && (
+      <>
+        {formErrors.causalFactors && <br />} 
+        <span>{formErrors.otherCausalFactors}</span>
+      </>
+    )}
+  </p>
+)}
+
 
     <div className="button-group">
       <button className="back" type="button" onClick={handleBack}>Back</button>
@@ -433,40 +455,85 @@ export default function Main() {
     <p>Was Stop Work Authority Enforced?</p>
     <div className="radio-group">
       <div className="radio-item">
-        <input type="radio" name="stopWorkEnforced" value="yes" checked={formData.stopWorkEnforced === "yes"} onChange={handleChange} />
+        <input
+          type="radio"
+          name="stopWorkEnforced"
+          value="yes"
+          checked={formData.stopWorkEnforced === "yes"}
+          onChange={handleChange}
+        />
         <label htmlFor="stopWorkEnforced">Yes</label>
       </div>
       <div className="radio-item">
-        <input type="radio" name="stopWorkEnforced" value="no" checked={formData.stopWorkEnforced === "no"} onChange={handleChange} />
+        <input
+          type="radio"
+          name="stopWorkEnforced"
+          value="no"
+          checked={formData.stopWorkEnforced === "no"}
+          onChange={handleChange}
+        />
         <label htmlFor="stopWorkEnforced">No</label>
       </div>
       <div className="radio-item">
-        <input type="radio" name="stopWorkEnforced" value="n/a" checked={formData.stopWorkEnforced === "n/a"} onChange={handleChange} />
+        <input
+          type="radio"
+          name="stopWorkEnforced"
+          value="n/a"
+          checked={formData.stopWorkEnforced === "n/a"}
+          onChange={handleChange}
+        />
         <label htmlFor="stopWorkEnforced">N/A</label>
       </div>
     </div>
     {formErrors.stopWorkEnforced && <p className="error">{formErrors.stopWorkEnforced}</p>}
 
     <label>Actions Taken For Stop Work Authority (Put N/A if SWA was not enforced)</label>
-    <textarea name="stopWorkActions" value={formData.stopWorkActions} onChange={handleChange} placeholder="Description of action taken for stop work authority"></textarea>
+    <textarea
+      name="stopWorkActions"
+      value={formData.stopWorkActions}
+      onChange={handleChange}
+      placeholder="Description of action taken for stop work authority"
+    ></textarea>
     {formErrors.stopWorkActions && <p className="error">{formErrors.stopWorkActions}</p>}
 
     <label>Attach Evidence (Images/Documents)</label>
-    <div className="file-upload-container" onDrop={handleDrop} onDragOver={handleDragOver} onClick={() => document.getElementById("file-upload").click()} style={{ padding: "20px", textAlign: "center", cursor: "pointer" }}>
-      <img src="/images/upload.png" alt="Dexter Logo" />
-      <p><span id="upload">Click to upload</span> or drag and drop</p>
-      <p>SVG, PNG, JPG, or GIF (max. 800×400px)</p>
-      <input id="file-upload" type="file" name="stopWorkEvidence" style={{ display: "none" }} onChange={handleFileChange} accept="image/svg+xml, image/png, image/jpeg, image/gif" />
+    {formData.stopWorkEvidence ? (
+      <div className="file-preview-container">
+  <img src="/images/file-icon.png" alt="File Icon" className="file-icon" />
+  <div className="file-info">
+    <p className="file-name">{formData.stopWorkEvidence.name}</p>
+    <p className="file-size">{(formData.stopWorkEvidence.size / 1024).toFixed(1)} KB</p>
+    <div className="progress-wrapper">
+      <div className="progress-bar">
+        <div className="progress"></div>
+      </div>
+      <span className="progress-percent">100%</span>
     </div>
-    {formData.stopWorkEvidence && <p>Uploaded file: {formData.stopWorkEvidence.name}</p>}
+  </div>
+  <img src="/images/delete.png" className="delete-icon" alt="Delete Icon" onClick={() => setFormData({ ...formData, stopWorkEvidence: null })} />
+</div>
+
+
+) : (
+  <div className="file-upload-container" onDrop={handleDrop} onDragOver={handleDragOver} onClick={() => document.getElementById("file-upload").click()} style={{ padding: "20px", textAlign: "center", cursor: "pointer" }}>
+    <img src="/images/upload.png" alt="Upload" />
+    <p><span id="upload">Click to upload</span> or drag and drop</p>
+    <p>SVG, PNG, JPG, or GIF (max. 800×400px)</p>
+    <input id="file-upload" type="file" name="stopWorkEvidence" style={{ display: "none" }} onChange={handleFileChange} accept="image/svg+xml, image/png, image/jpeg, image/gif" />
+  </div>
+)}
+
     {formErrors.stopWorkEvidence && <p className="error">{formErrors.stopWorkEvidence}</p>}
 
     <div className="button-group">
-      <button className="back" type="button" onClick={handleBack}>Back</button>
+      <button className="back" type="button" onClick={handleBack}>
+        Back
+      </button>
       <button type="submit">Submit</button>
     </div>
   </>
 )}
+
             </form>
           </div>
         )}
