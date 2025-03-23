@@ -48,7 +48,7 @@ label {
   height: 68px;
   margin-bottom: 53px;
   width: 100%;
-  border-bottom: 1px solid #4c4c4c;
+  border-bottom: 1px solid #ece0e0;
   position: sticky;
   background-color: white;
   padding: 16px 100px;
@@ -362,7 +362,6 @@ input[type="file"] {
 }
 
 
-/* For screens 1024px and below */
 @media (max-width: 1024px) {
   .form-header {
     padding: 16px 20px;

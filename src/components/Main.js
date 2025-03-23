@@ -176,17 +176,27 @@ export default function Main() {
   const handleNext = () => {
     if (validateForm(step)) {
       setStep(step + 1);
+      scrollToFormTitle();  // Scroll to the form title
     }
   };
-
+  
   const handleBack = () => {
     setStep(step - 1);
+    scrollToFormTitle();  // Scroll to the form title
   };
-
+  
+  // Scroll to the form title section
+  const scrollToFormTitle = () => {
+    const formTitleElement = document.querySelector('.form-title');
+    if (formTitleElement) {
+      formTitleElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+  
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    
     const formPayload = {
       unsafe: formData.unsafe,
       location: formData.location,
@@ -208,7 +218,6 @@ export default function Main() {
     };
 
     try {
-      
       const response = await fetch("/api/submit", {
         method: "POST",
         headers: {
@@ -230,7 +239,6 @@ export default function Main() {
 
   return (
     <div className="main">
-      {/* Left Section with Image */}
       <div className="main-img">
         <div className="overlay">
           <h1>HOC CARD</h1>
@@ -238,26 +246,23 @@ export default function Main() {
         </div>
       </div>
 
-      {/* Right Section with Form */}
       <div className="main-form">
         <div className="form-header">
           <img src="/images/logo.png" alt="Dexter Logo" />
         </div>
 
         {formSubmitted ? (
-          <div className="success-message">
-            <div className="success-icon">
-            <img src="/images/success.png" alt="success icon" />
-            </div>
-            <h2>HOC card has been submitted successfully</h2>
-            <button
-              onClick={() => window.location.reload()}
-              className="finish-button"
-            >
-              Finish
-            </button>
-          </div>
-        ) : (
+  <div className="success-message">
+    <div className="success-icon">
+      <img src="/images/success.png" alt="success icon" />
+    </div>
+    <h2>HOC card has been submitted successfully</h2>
+    <button onClick={() => window.location.reload()} className="finish-button">
+      Finish
+    </button>
+  </div>
+)
+ : (
           <div className="form-content">
             <div className="form-title">
               <h2>HOC CARD</h2>
@@ -265,356 +270,197 @@ export default function Main() {
             </div>
 
             <form onSubmit={handleSubmit}>
-              {step === 1 && (
-                <>
-                  {/* Page 1 */}
-                  <p>Unsafe Act or Unsafe Condition?</p>
-                  <div className="radio-group">
-                    <div className="radio-item">
-                      <input
-                        type="radio"
-                        name="unsafe"
-                        value="act"
-                        checked={formData.unsafe === "act"}
-                        onChange={handleChange}
-                      />
-                      <label htmlFor="act">Unsafe Act</label>
-                    </div>
-                    <div className="radio-item">
-                      <input
-                        type="radio"
-                        name="unsafe"
-                        value="condition"
-                        checked={formData.unsafe === "condition"}
-                        onChange={handleChange}
-                      />
-                      <label htmlFor="condition">Unsafe Condition</label>
-                    </div>
-                    {formErrors.unsafe && (
-                      <p className="error">{formErrors.unsafe}</p>
-                    )}
-                  </div>
+            {step === 1 && (
+  <>
+    <p>Unsafe Act or Unsafe Condition?</p>
+    <div className="radio-group">
+      <div className="radio-item">
+        <input type="radio" name="unsafe" value="act" checked={formData.unsafe === "act"} onChange={handleChange} />
+        <label htmlFor="act">Unsafe Act</label>
+      </div>
+      <div className="radio-item">
+        <input type="radio" name="unsafe" value="condition" checked={formData.unsafe === "condition"} onChange={handleChange} />
+        <label htmlFor="condition">Unsafe Condition</label>
+      </div>
+      {formErrors.unsafe && <p className="error">{formErrors.unsafe}</p>}
+    </div>
 
-                  <label>Location</label>
-                  <input
-                    type="text"
-                    name="location"
-                    value={formData.location}
-                    onChange={handleChange}
-                  />
-                  {formErrors.location && (
-                    <p className="error">{formErrors.location}</p>
-                  )}
+    <label>Location</label>
+    <input type="text" name="location" value={formData.location} onChange={handleChange} />
+    {formErrors.location && <p className="error">{formErrors.location}</p>}
 
-                  <label>Observer Name</label>
-                  <input
-                    type="text"
-                    name="observerName"
-                    value={formData.observerName}
-                    onChange={handleChange}
-                  />
-                  {formErrors.observerName && (
-                    <p className="error">{formErrors.observerName}</p>
-                  )}
+    <label>Observer Name</label>
+    <input type="text" name="observerName" value={formData.observerName} onChange={handleChange} />
+    {formErrors.observerName && <p className="error">{formErrors.observerName}</p>}
 
-                  <label>Company</label>
-                  <input
-                    type="text"
-                    name="company"
-                    value={formData.company}
-                    onChange={handleChange}
-                  />
-                  {formErrors.company && (
-                    <p className="error">{formErrors.company}</p>
-                  )}
+    <label>Company</label>
+    <input type="text" name="company" value={formData.company} onChange={handleChange} />
+    {formErrors.company && <p className="error">{formErrors.company}</p>}
 
-                  <label>Position</label>
-                  <input
-                    type="text"
-                    name="position"
-                    value={formData.position}
-                    onChange={handleChange}
-                  />
-                  {formErrors.position && (
-                    <p className="error">{formErrors.position}</p>
-                  )}
+    <label>Position</label>
+    <input type="text" name="position" value={formData.position} onChange={handleChange} />
+    {formErrors.position && <p className="error">{formErrors.position}</p>}
 
-                  <div className="date-time-group">
-                    <div className="date-field">
-                      <label htmlFor="date">Date</label>
-                      <input
-                        type="date"
-                        name="date"
-                        value={formData.date}
-                        onChange={handleChange}
-                      />
-                      {formErrors.date && (
-                        <p className="error">{formErrors.date}</p>
-                      )}
-                    </div>
-                    <div className="time-field">
-                      <label htmlFor="time">Time</label>
-                      <input
-                        type="time"
-                        name="time"
-                        value={formData.time}
-                        onChange={handleChange}
-                      />
-                      {formErrors.time && (
-                        <p className="error">{formErrors.time}</p>
-                      )}
-                    </div>
-                  </div>
+    <div className="date-time-group">
+      <div className="date-field">
+        <label htmlFor="date">Date</label>
+        <input 
+          type="date" 
+          name="date" 
+          value={formData.date} 
+          onChange={handleChange} 
+          min={new Date().toISOString().split('T')[0]} 
+          max={new Date().toISOString().split('T')[0]}
+          onClick={(e) => e.target.showPicker()} 
+        />
+        {formErrors.date && <p className="error">{formErrors.date}</p>}
+      </div>
+      <div className="time-field">
+        <label htmlFor="time">Time</label>
+        <input type="time" name="time" value={formData.time} onChange={handleChange} onClick={(e) => e.target.showPicker()}/>
+        {formErrors.time && <p className="error">{formErrors.time}</p>}
+      </div>
+    </div>
 
-                  <button type="button" onClick={handleNext}>
-                    Next
-                  </button>
-                </>
-              )}
+    <button type="button" onClick={handleNext}>Next</button>
+  </>
+)}
 
-              {step === 2 && (
-                <>
-                  {/* Page 2 */}
-                  <label>Comprehensive Incident Details</label>
-                  <textarea
-                    name="incidentDetails"
-                    value={formData.incidentDetails}
-                    onChange={handleChange}
-                    placeholder="Description of incident details"
-                  ></textarea>
-                  {formErrors.incidentDetails && (
-                    <p className="error">{formErrors.incidentDetails}</p>
-                  )}
 
-                  <label>Actions Taken or Proposed for Correction</label>
-                  <textarea
-                    name="correctiveActions"
-                    value={formData.correctiveActions}
-                    onChange={handleChange}
-                    placeholder="Description of Actions Implemented"
-                  ></textarea>
-                  {formErrors.correctiveActions && (
-                    <p className="error">{formErrors.correctiveActions}</p>
-                  )}
+{step === 2 && (
+  <>
+    <label>Comprehensive Incident Details</label>
+    <textarea name="incidentDetails" value={formData.incidentDetails} onChange={handleChange} placeholder="Description of incident details"></textarea>
+    {formErrors.incidentDetails && <p className="error">{formErrors.incidentDetails}</p>}
 
-                  <div className="button-group">
-                    <button className="back" type="button" onClick={handleBack}>
-                      Back
-                    </button>
-                    <button type="button" onClick={handleNext}>
-                      Next
-                    </button>
-                  </div>
-                </>
-              )}
+    <label>Actions Taken or Proposed for Correction</label>
+    <textarea name="correctiveActions" value={formData.correctiveActions} onChange={handleChange} placeholder="Description of Actions Implemented"></textarea>
+    {formErrors.correctiveActions && <p className="error">{formErrors.correctiveActions}</p>}
 
-              {step === 3 && (
-                <>
-                  {/* Page 3 */}
-                  <h3 id="savings">Life-Saving Rules Violated?</h3>
-                  <div className="checkbox-group">
-                    {[
-                      "Work Permit",
-                      "Energized System",
-                      "Overriding Equipment Safety",
-                      "Working at Height",
-                      "Smoking, Drug, and Alcohol",
-                      "Lifting Operations",
-                      "Toxic Gases",
-                      "Confined Space",
-                      "Management of Change",
-                      "Suspended Load",
-                      "Driving Safety",
-                      "Journey Management",
-                    ].map((rule) => (
-                      <label key={rule} className="custom-checkbox-label">
-                        <input
-                          type="checkbox"
-                          name="lifeSavingRules"
-                          value={rule}
-                          checked={formData.lifeSavingRules.includes(rule)}
-                          onChange={handleChange}
-                        />
-                        <span className="custom-checkbox"></span>
-                        {rule}
-                      </label>
-                    ))}
-                  </div>
-                  {formErrors.lifeSavingRules && (
-                    <p className="error">{formErrors.lifeSavingRules}</p>
-                  )}
+    <div className="button-group">
+      <button className="back" type="button" onClick={handleBack}>Back</button>
+      <button type="button" onClick={handleNext}>Next</button>
+    </div>
+  </>
+)}
 
-                  <h3 id="causal">Likely Causal Factor(s)?</h3>
-                  <div className="checkbox-group">
-                    {[
-                      "Human Error",
-                      "Poor Chemical Handling",
-                      "Fall Protection",
-                      "Defective Equipment",
-                      "Inadequate Planning",
-                      "Poor Housekeeping",
-                      "By-Passing Safety Features",
-                      "No/Poor Supervision",
-                      "Radiation Exposure",
-                      "Road Condition",
-                      "Line of Fire",
-                      "Poor Training",
-                      "Working Without PTW/JSA",
-                      "No/Inadequate PPE",
-                      "Poor Visibility",
-                      "Inadequate Guards",
-                      "Pressurized Vessel",
-                      "Procedure Not Followed",
-                      "Lack of Competence",
-                      "Weather Condition",
-                      "Inadequate Ventilation",
-                      "Explosive Atmosphere",
-                      "Noise Exposure",
-                      "Improper Loading",
-                    ].map((factor) => (
-                      <label key={factor} className="custom-checkbox-label">
-                        <input
-                          type="checkbox"
-                          name="causalFactors"
-                          value={factor}
-                          checked={formData.causalFactors.includes(factor)}
-                          onChange={handleChange}
-                        />
-                        <span className="custom-checkbox"></span>
-                        {factor}
-                      </label>
-                    ))}
+{step === 3 && (
+  <>
+    <h3 id="savings">Life-Saving Rules Violated?</h3>
+    <div className="checkbox-group">
+      {[
+        "Work Permit",
+        "Energized System",
+        "Overriding Equipment Safety",
+        "Working at Height",
+        "Smoking, Drug, and Alcohol",
+        "Lifting Operations",
+        "Toxic Gases",
+        "Confined Space",
+        "Management of Change",
+        "Suspended Load",
+        "Driving Safety",
+        "Journey Management",
+      ].map((rule) => (
+        <label key={rule} className="custom-checkbox-label">
+          <input type="checkbox" name="lifeSavingRules" value={rule} checked={formData.lifeSavingRules.includes(rule)} onChange={handleChange} />
+          <span className="custom-checkbox"></span>
+          {rule}
+        </label>
+      ))}
+    </div>
+    {formErrors.lifeSavingRules && <p className="error">{formErrors.lifeSavingRules}</p>}
 
-                    {/* 'Others' checkbox and input field */}
-                    <label key="Others" className="custom-checkbox-label">
-                      <input
-                        type="checkbox"
-                        name="causalFactors"
-                        value="Others"
-                        checked={formData.causalFactors.includes("Others")}
-                        onChange={handleChange}
-                      />
-                      <span className="custom-checkbox"></span>
-                      Others
-                      <input
-                        type="text"
-                        name="otherCausalFactors"
-                        value={formData.otherCausalFactors || ""}
-                        onChange={handleChange}
-                        placeholder="Specify"
-                        className="others-input"
-                      />
-                    </label>
-                  </div>
-                  {formErrors.causalFactors && (
-                    <p className="error">{formErrors.causalFactors}</p>
-                  )}
+    <h3 id="causal">Likely Causal Factor(s)?</h3>
+    <div className="checkbox-group">
+      {[
+        "Human Error",
+        "Poor Chemical Handling",
+        "Fall Protection",
+        "Defective Equipment",
+        "Inadequate Planning",
+        "Poor Housekeeping",
+        "By-Passing Safety Features",
+        "No/Poor Supervision",
+        "Radiation Exposure",
+        "Road Condition",
+        "Line of Fire",
+        "Poor Training",
+        "Working Without PTW/JSA",
+        "No/Inadequate PPE",
+        "Poor Visibility",
+        "Inadequate Guards",
+        "Pressurized Vessel",
+        "Procedure Not Followed",
+        "Lack of Competence",
+        "Weather Condition",
+        "Inadequate Ventilation",
+        "Explosive Atmosphere",
+        "Noise Exposure",
+        "Improper Loading",
+      ].map((factor) => (
+        <label key={factor} className="custom-checkbox-label">
+          <input type="checkbox" name="causalFactors" value={factor} checked={formData.causalFactors.includes(factor)} onChange={handleChange} />
+          <span className="custom-checkbox"></span>
+          {factor}
+        </label>
+      ))}
 
-                  <div className="button-group">
-                    <button className="back" type="button" onClick={handleBack}>
-                      Back
-                    </button>
-                    <button type="button" onClick={handleNext}>
-                      Next
-                    </button>
-                  </div>
-                </>
-              )}
+      <label key="Others" className="custom-checkbox-label">
+        <input type="checkbox" name="causalFactors" value="Others" checked={formData.causalFactors.includes("Others")} onChange={handleChange} />
+        <span className="custom-checkbox"></span>
+        Others
+        <input type="text" name="otherCausalFactors" value={formData.otherCausalFactors || ""} onChange={handleChange} placeholder="Specify" className="others-input" />
+      </label>
+    </div>
+    {formErrors.causalFactors && <p className="error">{formErrors.causalFactors}</p>}
 
-              {step === 4 && (
-                <>
-                  {/* Page 4 */}
-                  <p>Was Stop Work Authority Enforced?</p>
-                  <div className="radio-group">
-                    <div className="radio-item">
-                      <input
-                        type="radio"
-                        name="stopWorkEnforced"
-                        value="yes"
-                        checked={formData.stopWorkEnforced === "yes"}
-                        onChange={handleChange}
-                      />
-                      <label htmlFor="stopWorkEnforced">Yes</label>
-                    </div>
-                    <div className="radio-item">
-                      <input
-                        type="radio"
-                        name="stopWorkEnforced"
-                        value="no"
-                        checked={formData.stopWorkEnforced === "no"}
-                        onChange={handleChange}
-                      />
-                      <label htmlFor="stopWorkEnforced">No</label>
-                    </div>
-                    <div className="radio-item">
-                      <input
-                        type="radio"
-                        name="stopWorkEnforced"
-                        value="n/a"
-                        checked={formData.stopWorkEnforced === "n/a"}
-                        onChange={handleChange}
-                      />
-                      <label htmlFor="stopWorkEnforced">N/A</label>
-                    </div>
-                  </div>
-                  {formErrors.stopWorkEnforced && (
-                    <p className="error">{formErrors.stopWorkEnforced}</p>
-                  )}
+    <div className="button-group">
+      <button className="back" type="button" onClick={handleBack}>Back</button>
+      <button type="button" onClick={handleNext}>Next</button>
+    </div>
+  </>
+)}
 
-                  <label>Actions Taken For Stop Work Authority</label>
-                  <textarea
-                    name="stopWorkActions"
-                    value={formData.stopWorkActions}
-                    onChange={handleChange}
-                    placeholder="Description of action taken for stop work authority"
-                  ></textarea>
-                  {formErrors.stopWorkActions && (
-                    <p className="error">{formErrors.stopWorkActions}</p>
-                  )}
+{step === 4 && (
+  <>
+    <p>Was Stop Work Authority Enforced?</p>
+    <div className="radio-group">
+      <div className="radio-item">
+        <input type="radio" name="stopWorkEnforced" value="yes" checked={formData.stopWorkEnforced === "yes"} onChange={handleChange} />
+        <label htmlFor="stopWorkEnforced">Yes</label>
+      </div>
+      <div className="radio-item">
+        <input type="radio" name="stopWorkEnforced" value="no" checked={formData.stopWorkEnforced === "no"} onChange={handleChange} />
+        <label htmlFor="stopWorkEnforced">No</label>
+      </div>
+      <div className="radio-item">
+        <input type="radio" name="stopWorkEnforced" value="n/a" checked={formData.stopWorkEnforced === "n/a"} onChange={handleChange} />
+        <label htmlFor="stopWorkEnforced">N/A</label>
+      </div>
+    </div>
+    {formErrors.stopWorkEnforced && <p className="error">{formErrors.stopWorkEnforced}</p>}
 
-                  <label>Attach Evidence (Images/Documents)</label>
-                  <div
-                    className="file-upload-container"
-                    onDrop={handleDrop}
-                    onDragOver={handleDragOver}
-                    onClick={() =>
-                      document.getElementById("file-upload").click()
-                    }
-                    style={{
-                      padding: "20px",
-                      textAlign: "center",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <img src="/images/upload.png" alt="Dexter Logo" />
-                    <p>
-                      <span id="upload">Click to upload</span> or drag and drop
-                    </p>
-                    <p>SVG, PNG, JPG, or GIF (max. 800×400px)</p>
-                    <input
-                      id="file-upload"
-                      type="file"
-                      name="stopWorkEvidence"
-                      style={{ display: "none" }}
-                      onChange={handleFileChange}
-                      accept="image/svg+xml, image/png, image/jpeg, image/gif"
-                    />
-                  </div>
-                  {formData.stopWorkEvidence && (
-                    <p>Uploaded file: {formData.stopWorkEvidence.name}</p>
-                  )}
-                  {formErrors.stopWorkEvidence && (
-                    <p className="error">{formErrors.stopWorkEvidence}</p>
-                  )}
+    <label>Actions Taken For Stop Work Authority (Put N/A if SWA was not enforced)</label>
+    <textarea name="stopWorkActions" value={formData.stopWorkActions} onChange={handleChange} placeholder="Description of action taken for stop work authority"></textarea>
+    {formErrors.stopWorkActions && <p className="error">{formErrors.stopWorkActions}</p>}
 
-                  <div className="button-group">
-                    <button className="back" type="button" onClick={handleBack}>
-                      Back
-                    </button>
-                    <button type="submit">Submit</button>
-                  </div>
-                </>
-              )}
+    <label>Attach Evidence (Images/Documents)</label>
+    <div className="file-upload-container" onDrop={handleDrop} onDragOver={handleDragOver} onClick={() => document.getElementById("file-upload").click()} style={{ padding: "20px", textAlign: "center", cursor: "pointer" }}>
+      <img src="/images/upload.png" alt="Dexter Logo" />
+      <p><span id="upload">Click to upload</span> or drag and drop</p>
+      <p>SVG, PNG, JPG, or GIF (max. 800×400px)</p>
+      <input id="file-upload" type="file" name="stopWorkEvidence" style={{ display: "none" }} onChange={handleFileChange} accept="image/svg+xml, image/png, image/jpeg, image/gif" />
+    </div>
+    {formData.stopWorkEvidence && <p>Uploaded file: {formData.stopWorkEvidence.name}</p>}
+    {formErrors.stopWorkEvidence && <p className="error">{formErrors.stopWorkEvidence}</p>}
+
+    <div className="button-group">
+      <button className="back" type="button" onClick={handleBack}>Back</button>
+      <button type="submit">Submit</button>
+    </div>
+  </>
+)}
             </form>
           </div>
         )}
