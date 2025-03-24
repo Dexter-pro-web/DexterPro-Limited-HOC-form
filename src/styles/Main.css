@@ -512,6 +512,9 @@ input[type="file"] {
     width: auto;
     padding: 20px;
     height: auto;
+    max-height: 90vh;
+    padding-bottom: 0;
+    margin-bottom: 0;
   }
   .form-header {
     padding: 0;
