@@ -259,6 +259,7 @@ export default function Main() {
         throw new Error(responseData.error || 'Failed to submit.');
       }
     } catch (error) {
+      console.error('Form submission error:', error);
       toast.error(error.message || 'An error occurred. Please try again.');
       setStatus('');
     } finally {

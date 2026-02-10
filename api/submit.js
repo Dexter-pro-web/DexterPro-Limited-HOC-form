@@ -48,6 +48,17 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // Check for required environment variables
+  if (!process.env.RESEND_API_KEY) {
+    console.error('ERROR: RESEND_API_KEY is not set in environment variables');
+    return res.status(500).json({ error: 'Server configuration error: RESEND_API_KEY is missing' });
+  }
+
+  if (!process.env.RECIPIENT_EMAIL) {
+    console.error('ERROR: RECIPIENT_EMAIL is not set in environment variables');
+    return res.status(500).json({ error: 'Server configuration error: RECIPIENT_EMAIL is missing' });
+  }
+
   const {
     unsafe,
     location,
@@ -175,8 +186,15 @@ export default async function handler(req, res) {
     });
 
     if (error) {
-      console.error('Resend Error:', error);
-      return res.status(400).json({ error: error.message });
+      console.error('RESEND EMAIL ERROR:', JSON.stringify(error, null, 2));
+      
+      // Check if it's an authentication error
+      if (error.message?.includes('Unauthorized') || error.message?.includes('Invalid') || error.message?.includes('authentication')) {
+        console.error('ERROR: Invalid RESEND_API_KEY - Authentication failed');
+        return res.status(400).json({ error: 'Email service authentication failed. Invalid RESEND_API_KEY.' });
+      }
+      
+      return res.status(400).json({ error: `Email service error: ${error.message}` });
     }
 
     // 3. Auto-delete blob after email sent (cleanup storage)
@@ -191,7 +209,18 @@ export default async function handler(req, res) {
     return res.status(200).json({ success: true, id: data.id });
 
   } catch (error) {
-    console.error('Server Error:', error.message);
-    return res.status(500).json({ error: error.message });
+    console.error('SERVER ERROR:', error.message);
+    console.error('Full error details:', error);
+    
+    // Identify which service is failing
+    if (error.message?.includes('Resend') || error.message?.includes('email')) {
+      return res.status(500).json({ error: `Resend email service error: ${error.message}. Check RESEND_API_KEY.` });
+    }
+    
+    if (error.message?.includes('blob') || error.message?.includes('Blob')) {
+      return res.status(500).json({ error: `Blob storage error: ${error.message}. Check BLOB_READ_WRITE_TOKEN.` });
+    }
+    
+    return res.status(500).json({ error: `Server error: ${error.message}` });
   }
 }
