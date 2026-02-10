@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
+import { upload } from '@vercel/blob/client';
+import { toast } from 'react-toastify';
 import '../styles/Main.css';
 
 export default function Main() {
   const [step, setStep] = useState(1);
   const [formErrors, setFormErrors] = useState({});
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [status, setStatus] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     unsafe: '',
     location: '',
@@ -186,25 +190,57 @@ export default function Main() {
       return;
     }
 
-    const formPayload = {
-      unsafe: formData.unsafe,
-      location: formData.location,
-      observerName: formData.observerName,
-      company: formData.company,
-      position: formData.position,
-      date: formData.date,
-      time: formData.time,
-      incidentDetails: formData.incidentDetails,
-      correctiveActions: formData.correctiveActions,
-      lifeSavingRules: formData.lifeSavingRules,
-      causalFactors: formData.causalFactors,
-      otherCausalFactors: formData.otherCausalFactors || '',
-      stopWorkEnforced: formData.stopWorkEnforced,
-      stopWorkActions: formData.stopWorkActions,
-      stopWorkEvidence: formData.stopWorkEvidence ? formData.stopWorkEvidence.name : null,
-    };
+    setIsSubmitting(true);
+    setStatus('Processing...');
 
     try {
+      let fileUrl = '';
+
+      // 1. Upload file to Vercel Blob if present
+      if (formData.stopWorkEvidence) {
+        const MAX_FILE_SIZE = 5 * 1024 * 1024;
+        if (formData.stopWorkEvidence.size > MAX_FILE_SIZE) {
+          toast.error('File must be less than 5MB.');
+          setIsSubmitting(false);
+          setStatus('');
+          return;
+        }
+
+        if (!formData.stopWorkEvidence.type.startsWith('image/')) {
+          toast.error('Please upload an image file.');
+          setIsSubmitting(false);
+          setStatus('');
+          return;
+        }
+
+        setStatus('Uploading attachment...');
+        const newBlob = await upload(formData.stopWorkEvidence.name, formData.stopWorkEvidence, {
+          access: 'public',
+          handleUploadUrl: '/api/blob-upload',
+        });
+        fileUrl = newBlob.url;
+      }
+
+      // 2. Send form data + image URL to backend
+      setStatus('Sending message...');
+      const formPayload = {
+        unsafe: formData.unsafe,
+        location: formData.location,
+        observerName: formData.observerName,
+        company: formData.company,
+        position: formData.position,
+        date: formData.date,
+        time: formData.time,
+        incidentDetails: formData.incidentDetails,
+        correctiveActions: formData.correctiveActions,
+        lifeSavingRules: formData.lifeSavingRules,
+        causalFactors: formData.causalFactors,
+        otherCausalFactors: formData.otherCausalFactors || '',
+        stopWorkEnforced: formData.stopWorkEnforced,
+        stopWorkActions: formData.stopWorkActions,
+        fileUrl: fileUrl,
+      };
+
       const response = await fetch('/api/submit', {
         method: 'POST',
         headers: {
@@ -213,14 +249,20 @@ export default function Main() {
         body: JSON.stringify(formPayload),
       });
 
+      const responseData = await response.json();
+
       if (response.ok) {
+        toast.success('Submitted successfully!');
         setFormSubmitted(true);
-        console.log('Form submitted successfully!');
+        setStatus('');
       } else {
-        console.error('Form submission failed.');
+        throw new Error(responseData.error || 'Failed to submit.');
       }
     } catch (error) {
-      console.error('An error occurred during form submission:', error);
+      toast.error(error.message || 'An error occurred. Please try again.');
+      setStatus('');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -585,7 +627,9 @@ export default function Main() {
                     <button className="back" type="button" onClick={handleBack}>
                       Back
                     </button>
-                    <button type="submit">Submit</button>
+                    <button type="submit" disabled={isSubmitting}>
+                      {status || 'Submit'}
+                    </button>
                   </div>
                 </>
               )}
