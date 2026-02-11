@@ -8,3 +8,24 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
+
+/* Sonner Toast Styling */
+.sonner-toaster {
+  top: 20px;
+  right: 20px;
+}
+
+.sonner-toast {
+  border-left: 5px solid red !important;
+}
+
+/* Mobile - Center align */
+@media (max-width: 768px) {
+  .sonner-toaster {
+    left: 0 !important;
+    right: 0 !important;
+    margin: 0 auto !important;
+    width: calc(100% - 40px) !important;
+    max-width: none !important;
+  }
+}

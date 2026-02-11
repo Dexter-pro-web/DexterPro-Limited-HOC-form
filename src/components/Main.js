@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { upload } from '@vercel/blob/client';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 import '../styles/Main.css';
 
 export default function Main() {
   const [step, setStep] = useState(1);
-  const [formErrors, setFormErrors] = useState({});
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [status, setStatus] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,7 +24,12 @@ export default function Main() {
     stopWorkActions: '',
     stopWorkEvidence: null,
     otherCausalFactors: '',
+    otherLifeSavingRules: '',
   });
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   const handleChange = e => {
     const { name, value, type, checked } = e.target;
@@ -34,6 +38,14 @@ export default function Main() {
       setFormData({
         ...formData,
         otherCausalFactors: value,
+      });
+      return;
+    }
+
+    if (name === 'otherLifeSavingRules') {
+      setFormData({
+        ...formData,
+        otherLifeSavingRules: value,
       });
       return;
     }
@@ -116,6 +128,12 @@ export default function Main() {
       if (formData.lifeSavingRules.length === 0) {
         errors.lifeSavingRules = 'Please select at least one life-saving rule.';
       }
+      if (
+        formData.lifeSavingRules.includes('Others') &&
+        (!formData.otherLifeSavingRules || formData.otherLifeSavingRules.trim() === '')
+      ) {
+        errors.otherLifeSavingRules = 'Please specify other life-saving rules.';
+      }
       if (formData.causalFactors.length === 0) {
         errors.causalFactors = 'Please select at least one causal factor.';
       }
@@ -131,7 +149,10 @@ export default function Main() {
       if (!formData.stopWorkEnforced) {
         errors.stopWorkEnforced = 'Please select if stop work authority was enforced.';
       }
-      if (!formData.stopWorkActions || formData.stopWorkActions.trim() === '') {
+      if (
+        formData.stopWorkEnforced === 'yes' &&
+        (!formData.stopWorkActions || formData.stopWorkActions.trim() === '')
+      ) {
         errors.stopWorkActions = 'Please provide the actions taken for stop work authority.';
       }
       if (
@@ -140,12 +161,16 @@ export default function Main() {
       ) {
         errors.stopWorkEvidence = 'Unsupported file type. Please upload a PNG, JPG, GIF, or SVG file.';
       }
-      if (formData.stopWorkEvidence && formData.stopWorkEvidence.size > 1048576) {
-        errors.stopWorkEvidence = 'File size must be less than 1MB.';
+      if (formData.stopWorkEvidence && formData.stopWorkEvidence.size > 5242880) {
+        errors.stopWorkEvidence = 'File size must be less than 5MB.';
       }
     }
 
-    setFormErrors(errors);
+    // Show toast messages for any errors
+    Object.values(errors).forEach(error => {
+      toast.error(error);
+    });
+
     return Object.keys(errors).length === 0;
   };
 
@@ -167,20 +192,17 @@ export default function Main() {
   const handleNext = () => {
     if (validateForm(step)) {
       setStep(step + 1);
-      scrollToFormTitle();
+      scrollToTop();
     }
   };
 
   const handleBack = () => {
     setStep(step - 1);
-    scrollToFormTitle();
+    scrollToTop();
   };
 
-  const scrollToFormTitle = () => {
-    const formTitleElement = document.querySelector('.form-title');
-    if (formTitleElement) {
-      formTitleElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSubmit = async e => {
@@ -234,6 +256,7 @@ export default function Main() {
         incidentDetails: formData.incidentDetails,
         correctiveActions: formData.correctiveActions,
         lifeSavingRules: formData.lifeSavingRules,
+        otherLifeSavingRules: formData.otherLifeSavingRules || '',
         causalFactors: formData.causalFactors,
         otherCausalFactors: formData.otherCausalFactors || '',
         stopWorkEnforced: formData.stopWorkEnforced,
@@ -323,24 +346,23 @@ export default function Main() {
                       />
                       <label htmlFor="condition">Unsafe Condition</label>
                     </div>
-                    {formErrors.unsafe && <p className="error">{formErrors.unsafe}</p>}
                   </div>
 
                   <label>Location</label>
                   <input type="text" name="location" value={formData.location} onChange={handleChange} />
-                  {formErrors.location && <p className="error">{formErrors.location}</p>}
+
 
                   <label>Observer Name</label>
                   <input type="text" name="observerName" value={formData.observerName} onChange={handleChange} />
-                  {formErrors.observerName && <p className="error">{formErrors.observerName}</p>}
+
 
                   <label>Company</label>
                   <input type="text" name="company" value={formData.company} onChange={handleChange} />
-                  {formErrors.company && <p className="error">{formErrors.company}</p>}
+
 
                   <label>Position</label>
                   <input type="text" name="position" value={formData.position} onChange={handleChange} />
-                  {formErrors.position && <p className="error">{formErrors.position}</p>}
+
 
                   <div className="date-time-group">
                     <div className="date-field">
@@ -366,7 +388,7 @@ export default function Main() {
                         onClick={e => e.target.showPicker()}
                       />
 
-                      {formErrors.date && <p className="error">{formErrors.date}</p>}
+
                     </div>
                     <div className="time-field">
                       <label htmlFor="time">Time</label>
@@ -377,7 +399,7 @@ export default function Main() {
                         onChange={handleChange}
                         onClick={e => e.target.showPicker()}
                       />
-                      {formErrors.time && <p className="error">{formErrors.time}</p>}
+
                     </div>
                   </div>
 
@@ -395,7 +417,7 @@ export default function Main() {
                     value={formData.incidentDetails}
                     onChange={handleChange}
                     placeholder="Description of incident details"></textarea>
-                  {formErrors.incidentDetails && <p className="error">{formErrors.incidentDetails}</p>}
+
 
                   <label>Actions Taken or Proposed for Correction</label>
                   <textarea
@@ -403,7 +425,7 @@ export default function Main() {
                     value={formData.correctiveActions}
                     onChange={handleChange}
                     placeholder="Description of Actions Implemented"></textarea>
-                  {formErrors.correctiveActions && <p className="error">{formErrors.correctiveActions}</p>}
+
 
                   <div className="button-group">
                     <button className="back" type="button" onClick={handleBack}>
@@ -421,6 +443,7 @@ export default function Main() {
                   <h3 id="savings">Life-Saving Rules Violated?</h3>
                   <div className="checkbox-group">
                     {[
+                      'None',
                       'Work Permit',
                       'Energized System',
                       'Overriding Equipment Safety',
@@ -433,6 +456,7 @@ export default function Main() {
                       'Suspended Load',
                       'Driving Safety',
                       'Journey Management',
+                      'Others',
                     ].map(rule => (
                       <label key={rule} className="custom-checkbox-label">
                         <input
@@ -441,17 +465,30 @@ export default function Main() {
                           value={rule}
                           checked={formData.lifeSavingRules.includes(rule)}
                           onChange={handleChange}
+                          disabled={formData.lifeSavingRules.includes('None') && rule !== 'None'}
                         />
                         <span className="custom-checkbox"></span>
                         {rule}
                       </label>
                     ))}
                   </div>
-                  {formErrors.lifeSavingRules && <p className="error">{formErrors.lifeSavingRules}</p>}
+                  {formData.lifeSavingRules.includes('Others') && (
+                    <input
+                      type="text"
+                      name="otherLifeSavingRules"
+                      placeholder="Please specify other life-saving rules"
+                      value={formData.otherLifeSavingRules}
+                      onChange={handleChange}
+                      className="text-input"
+                      disabled={formData.lifeSavingRules.includes('None')}
+                    />
+                  )}
+
 
                   <h3 id="causal">Likely Causal Factor(s)?</h3>
                   <div className="checkbox-group">
                     {[
+                      'None',
                       'Human Error',
                       'Poor Chemical Handling',
                       'Fall Protection',
@@ -476,6 +513,7 @@ export default function Main() {
                       'Explosive Atmosphere',
                       'Noise Exposure',
                       'Improper Loading',
+                      'Others',
                     ].map(factor => (
                       <label key={factor} className="custom-checkbox-label">
                         <input
@@ -484,43 +522,25 @@ export default function Main() {
                           value={factor}
                           checked={formData.causalFactors.includes(factor)}
                           onChange={handleChange}
+                          disabled={formData.causalFactors.includes('None') && factor !== 'None'}
                         />
                         <span className="custom-checkbox"></span>
                         {factor}
                       </label>
                     ))}
-
-                    <label key="Others" className="custom-checkbox-label">
-                      <input
-                        type="checkbox"
-                        name="causalFactors"
-                        value="Others"
-                        checked={formData.causalFactors.includes('Others')}
-                        onChange={handleChange}
-                      />
-                      <span className="custom-checkbox"></span>
-                      Others
-                      <input
-                        type="text"
-                        name="otherCausalFactors"
-                        value={formData.otherCausalFactors || ''}
-                        onChange={handleChange}
-                        placeholder="Specify"
-                        className="others-input"
-                      />
-                    </label>
                   </div>
-                  {(formErrors.causalFactors || formErrors.otherCausalFactors) && (
-                    <p className="error">
-                      {formErrors.causalFactors && <span>{formErrors.causalFactors}</span>}
-                      {formErrors.otherCausalFactors && (
-                        <>
-                          {formErrors.causalFactors && <br />}
-                          <span>{formErrors.otherCausalFactors}</span>
-                        </>
-                      )}
-                    </p>
+                  {formData.causalFactors.includes('Others') && (
+                    <input
+                      type="text"
+                      name="otherCausalFactors"
+                      placeholder="Please specify other causal factors"
+                      value={formData.otherCausalFactors}
+                      onChange={handleChange}
+                      className="text-input"
+                      disabled={formData.causalFactors.includes('None')}
+                    />
                   )}
+
 
                   <div className="button-group">
                     <button className="back" type="button" onClick={handleBack}>
@@ -568,17 +588,19 @@ export default function Main() {
                       <label htmlFor="stopWorkEnforced">N/A</label>
                     </div>
                   </div>
-                  {formErrors.stopWorkEnforced && <p className="error">{formErrors.stopWorkEnforced}</p>}
 
-                  <label>Actions Taken For Stop Work Authority (Put N/A if SWA was not enforced)</label>
+
+                  <label>Actions Taken For Stop Work Authority</label>
                   <textarea
                     name="stopWorkActions"
                     value={formData.stopWorkActions}
                     onChange={handleChange}
-                    placeholder="Description of action taken for stop work authority"></textarea>
-                  {formErrors.stopWorkActions && <p className="error">{formErrors.stopWorkActions}</p>}
+                    placeholder="Description of action taken for stop work authority"
+                    disabled={formData.stopWorkEnforced === 'no' || formData.stopWorkEnforced === 'n/a'}
+                  ></textarea>
 
-                  <label>Attach Evidence (Images/Documents)</label>
+
+                  <label>Attach Evidence (Image)</label>
                   {formData.stopWorkEvidence ? (
                     <div className="file-preview-container">
                       <img src="/images/file-icon.png" alt="File Icon" className="file-icon" />
@@ -622,7 +644,7 @@ export default function Main() {
                     </div>
                   )}
 
-                  {formErrors.stopWorkEvidence && <p className="error">{formErrors.stopWorkEvidence}</p>}
+
 
                   <div className="button-group">
                     <button className="back" type="button" onClick={handleBack}>
