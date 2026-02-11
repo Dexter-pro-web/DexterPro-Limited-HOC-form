@@ -606,7 +606,7 @@ input[type='file'] {
   .form-title {
     position: fixed;
     top: 68px;
-    width: calc(100% - 32px);
+    width: 100%;
     background-color: white;
     padding: 16px 16px;
     box-sizing: border-box;
