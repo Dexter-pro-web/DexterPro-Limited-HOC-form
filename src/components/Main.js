@@ -9,7 +9,7 @@ export default function Main() {
   const [status, setStatus] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    unsafe: '',
+    condition: '',
     location: '',
     observerName: '',
     company: '',
@@ -33,22 +33,6 @@ export default function Main() {
 
   const handleChange = e => {
     const { name, value, type, checked } = e.target;
-
-    if (name === 'otherCausalFactors') {
-      setFormData({
-        ...formData,
-        otherCausalFactors: value,
-      });
-      return;
-    }
-
-    if (name === 'otherLifeSavingRules') {
-      setFormData({
-        ...formData,
-        otherLifeSavingRules: value,
-      });
-      return;
-    }
 
     if (type === 'checkbox') {
       if (name === 'lifeSavingRules') {
@@ -92,8 +76,8 @@ export default function Main() {
     const errors = {};
 
     if (step === 1) {
-      if (!formData.unsafe) {
-        errors.unsafe = 'Please select an unsafe act or condition.';
+      if (!formData.condition) {
+        errors.condition = 'Please select a condition type.';
       }
       if (!formData.location) {
         errors.location = 'Location is required.';
@@ -109,6 +93,13 @@ export default function Main() {
       }
       if (!formData.date) {
         errors.date = 'Date is required.';
+      } else {
+        const selectedDate = new Date(formData.date);
+        const today = new Date();
+        today.setHours(23, 59, 59, 999);
+        if (selectedDate > today) {
+          errors.date = 'You cannot select a future date.';
+        }
       }
       if (!formData.time) {
         errors.time = 'Time is required.';
@@ -220,21 +211,6 @@ export default function Main() {
 
       // 1. Upload file to Vercel Blob if present
       if (formData.stopWorkEvidence) {
-        const MAX_FILE_SIZE = 5 * 1024 * 1024;
-        if (formData.stopWorkEvidence.size > MAX_FILE_SIZE) {
-          toast.error('File must be less than 5MB.');
-          setIsSubmitting(false);
-          setStatus('');
-          return;
-        }
-
-        if (!formData.stopWorkEvidence.type.startsWith('image/')) {
-          toast.error('Please upload an image file.');
-          setIsSubmitting(false);
-          setStatus('');
-          return;
-        }
-
         setStatus('Uploading attachment...');
         const newBlob = await upload(formData.stopWorkEvidence.name, formData.stopWorkEvidence, {
           access: 'public',
@@ -246,7 +222,7 @@ export default function Main() {
       // 2. Send form data + image URL to backend
       setStatus('Sending message...');
       const formPayload = {
-        unsafe: formData.unsafe,
+        condition: formData.condition,
         location: formData.location,
         observerName: formData.observerName,
         company: formData.company,
@@ -324,27 +300,47 @@ export default function Main() {
             <form onSubmit={handleSubmit}>
               {step === 1 && (
                 <>
-                  <p>Unsafe Act or Unsafe Condition?</p>
+                  <p>Condition Type?</p>
                   <div className="radio-group">
                     <div className="radio-item">
                       <input
                         type="radio"
-                        name="unsafe"
-                        value="act"
-                        checked={formData.unsafe === 'act'}
+                        name="condition"
+                        value="unsafe-act"
+                        checked={formData.condition === 'unsafe-act'}
                         onChange={handleChange}
                       />
-                      <label htmlFor="act">Unsafe Act</label>
+                      <label htmlFor="unsafe-act">Unsafe Act</label>
                     </div>
                     <div className="radio-item">
                       <input
                         type="radio"
-                        name="unsafe"
-                        value="condition"
-                        checked={formData.unsafe === 'condition'}
+                        name="condition"
+                        value="unsafe-condition"
+                        checked={formData.condition === 'unsafe-condition'}
                         onChange={handleChange}
                       />
-                      <label htmlFor="condition">Unsafe Condition</label>
+                      <label htmlFor="unsafe-condition">Unsafe Condition</label>
+                    </div>
+                    <div className="radio-item">
+                      <input
+                        type="radio"
+                        name="condition"
+                        value="safe-act"
+                        checked={formData.condition === 'safe-act'}
+                        onChange={handleChange}
+                      />
+                      <label htmlFor="safe-act">Safe Act</label>
+                    </div>
+                    <div className="radio-item">
+                      <input
+                        type="radio"
+                        name="condition"
+                        value="safe-condition"
+                        checked={formData.condition === 'safe-condition'}
+                        onChange={handleChange}
+                      />
+                      <label htmlFor="safe-condition">Safe Condition</label>
                     </div>
                   </div>
 
@@ -371,19 +367,7 @@ export default function Main() {
                         type="date"
                         name="date"
                         value={formData.date}
-                        onChange={e => {
-                          const selectedDate = new Date(e.target.value);
-                          const today = new Date();
-
-                          if (e.target.value !== '') {
-                            if (selectedDate > today) {
-                              alert('You cannot select a future date.');
-                              e.target.value = today.toISOString().split('T')[0];
-                            } else {
-                              handleChange(e);
-                            }
-                          }
-                        }}
+                        onChange={handleChange}
                         max={new Date().toISOString().split('T')[0]}
                         onClick={e => e.target.showPicker()}
                       />

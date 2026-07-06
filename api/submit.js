@@ -60,7 +60,7 @@ export default async function handler(req, res) {
   }
 
   const {
-    unsafe,
+    condition,
     location,
     observerName,
     company,
@@ -132,7 +132,7 @@ export default async function handler(req, res) {
           <table style="width: 100%; border-collapse: collapse;">
             <tr style="border-bottom: 1px solid #ddd;">
               <td style="padding: 10px; font-weight: bold; width: 30%;">Type:</td>
-              <td style="padding: 10px;">${escapeHtml(unsafe)}</td>
+              <td style="padding: 10px;">${escapeHtml(condition)}</td>
             </tr>
             <tr style="border-bottom: 1px solid #ddd;">
               <td style="padding: 10px; font-weight: bold;">Location:</td>
